@@ -1,0 +1,96 @@
+<?php
+    //Some code will be here
+    session_start();
+
+    // Initialize the playfield if not already set
+    if (!isset($_SESSION['playfield'])) {
+        $_SESSION['playfield'] = [
+            ['', '', ''],
+            ['', '', ''],
+            ['', '', '']
+        ];
+    }
+    
+    // Handle the reset functionality
+    if (isset($_GET['reset'])) {
+        $_SESSION['playfield'] = [
+            ['', '', ''],
+            ['', '', ''],
+            ['', '', '']
+        ];
+        header("Location: " . strtok($_SERVER["REQUEST_URI"], '?'));
+        exit;
+    }
+
+    // Handle input from GET request
+    if (isset($_GET['row']) && isset($_GET['col']) && isset($_GET['mark'])) {
+        $row = (int)$_GET['row'];
+        $col = (int)$_GET['col'];
+        $mark = $_GET['mark'];
+
+        // Ensure valid input and update the playfield if the cell is empty
+        if ($row >= 0 && $row < 3 && $col >= 0 && $col < 3 && in_array($mark, ['X', 'O'])) {
+            if ($_SESSION['playfield'][$row][$col] === '') {
+                $_SESSION['playfield'][$row][$col] = $mark;
+            }
+        }
+    }
+
+?>
+
+<html>
+    <head>
+        <style>
+        body {
+            text-align:center;
+        }
+        table {
+            margin-left:auto;
+            margin-right:auto;
+            border-collapse: collapse;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        td {
+            padding: 10px;
+            border: 1px solid;
+            text-align: left;
+            height: 170px;
+            width: 150px;
+            text-align: center;
+        }
+
+        </style>
+    </head>
+
+    <body>
+    <h1>Tic-Tac-Toe</h1>
+
+    <table>
+        <?php
+            //Some code will be here
+            // Draw the playfield dynamically
+            for ($row = 0; $row < 3; $row++) {
+                echo "<tr>";
+                for ($col = 0; $col < 3; $col++) {
+                    echo "<td>";
+                    if ($_SESSION['playfield'][$row][$col] === 'X') {
+                        echo '<img src="2.png" alt="X" height="100">';
+                    } elseif ($_SESSION['playfield'][$row][$col] === 'O') {
+                        echo '<img src="1.png" alt="O" height="100">';
+                    } else {
+                        // Show links for writing X or O in empty cells
+                        echo '<a href="?row=' . $row . '&col=' . $col . '&mark=O">Write O</a><br>';
+                        echo '<a href="?row=' . $row . '&col=' . $col . '&mark=X">Write X</a>';
+                    }
+                    echo "</td>";
+                }
+                echo "</tr>";
+            }
+        ?>
+    </table>
+
+    <a href="?reset=true">Reset all</a>
+    
+    </body>
+</html>
